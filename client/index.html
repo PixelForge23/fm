@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#0a0a12" />
+<title>VOICE FM — Live Online FM Radio | Listen Free 24/7</title>
+<meta name="description" content="Listen to VOICE FM live online. Free 24/7 FM radio with music, talk shows and live DJs. No signup required." />
+<meta name="keywords" content="Online FM Radio,Live Radio Station,Internet Radio,Listen FM Online,Online Radio Station" />
+<link rel="canonical" href="https://voicefm.onrender.com/" />
+<meta property="og:title" content="VOICE FM — Live Online FM Radio" />
+<meta property="og:description" content="Listen live 24/7. Your Voice. Your Music. Your FM." />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<link rel="icon" href="/assets/img/logo-icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/assets/img/logo-icon.svg" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="stylesheet" href="/assets/css/style.css" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"RadioStation","name":"VOICE FM",
+"slogan":"Your Voice. Your Music. Your FM.","url":"https://voicefm.onrender.com/",
+"logo":"https://voicefm.onrender.com/assets/img/logo-icon.svg"}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="/">
+      <img src="/assets/img/logo-icon.svg" alt="VOICE FM" />
+      <span class="name" data-station-name>VOICE FM</span>
+    </a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <nav class="nav-links">
+      <a href="/" class="active">Home</a>
+      <a href="/live.html">Live Radio</a>
+      <a href="/programs.html">Programs</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <section class="hero">
+    <span class="live-badge" id="liveBadge" aria-live="polite">
+      <span class="dot"></span><span id="liveText">CONNECTING…</span>
+    </span>
+    <h1 id="heroTitle">LIVE FM RADIO</h1>
+    <p id="heroSubtitle">Listen Live. Anytime. Anywhere.</p>
+    <a href="/live.html" class="btn">▶ LISTEN LIVE</a>
+    <p class="muted" style="margin-top:14px;font-size:.9rem">
+      Tap Listen Live to start the radio.
+    </p>
+  </section>
+
+  <section class="grid cols-3">
+    <div class="card">
+      <h3>👥 <span id="listenerCount">0</span> Listening Now</h3>
+      <p class="muted">Join listeners tuning in right now.</p>
+    </div>
+    <div class="card">
+      <h3>🎙️ Now On Air</h3>
+      <p id="nowOnAir" class="muted">—</p>
+    </div>
+    <div class="card">
+      <h3>📻 Station</h3>
+      <p class="muted" id="stationTagline">Your Voice. Your Music. Your FM.</p>
+    </div>
+  </section>
+
+  <section style="margin-top:40px">
+    <h2>🎧 Share Live FM</h2>
+    <div class="row">
+      <a class="btn secondary" target="_blank" rel="noopener" href="https://wa.me/?text=Listen%20to%20VOICE%20FM%20live!">WhatsApp</a>
+      <a class="btn secondary" target="_blank" rel="noopener" href="https://www.facebook.com/sharer/sharer.php?u=">Facebook</a>
+      <a class="btn secondary" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=Listening%20to%20VOICE%20FM">X</a>
+      <button class="btn secondary" id="shareBtn">🔗 Copy Link</button>
+    </div>
+  </section>
+</main>
+
+<footer class="footer container">
+  <p>© <span id="year"></span> <span data-station-name>VOICE FM</span></p>
+  <p><a href="/privacy.html">Privacy</a> · <a href="/terms.html">Terms</a></p>
+</footer>
+
+<script type="module" src="/assets/js/app.js"></script>
+</body>
+</html>
