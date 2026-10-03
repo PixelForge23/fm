@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>About — VOICE FM</title>
+<link rel="icon" href="/assets/img/logo-icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head><body>
+<header class="site-header"><div class="container nav">
+  <a class="brand" href="/"><img src="/assets/img/logo-icon.svg" alt="VF" />
+    <span class="name" data-station-name>VOICE FM</span></a>
+  <button class="menu-btn">☰</button>
+  <nav class="nav-links">
+    <a href="/">Home</a><a href="/live.html">Live Radio</a>
+    <a href="/programs.html">Programs</a><a href="/schedule.html">Schedule</a>
+    <a href="/about.html" class="active">About</a><a href="/contact.html">Contact</a>
+  </nav>
+</div></header>
+<main class="container" style="padding-top:40px;max-width:800px">
+  <h1>About <span data-station-name>VOICE FM</span></h1>
+  <p class="muted" data-tagline>Your Voice. Your Music. Your FM.</p>
+  <div class="card" style="margin-top:20px">
+    <p id="aboutText">Loading…</p>
+  </div>
+</main>
+<footer class="footer container"><p>© <span id="year"></span> VOICE FM</p></footer>
+<script type="module">
+import '/assets/js/app.js';
+fetch('/api/settings').then(r => r.json()).then(s => {
+  document.getElementById('aboutText').textContent = s.aboutText || '';
+});
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body></html>
