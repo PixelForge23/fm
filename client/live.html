@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Listen Live — VOICE FM</title>
+<meta name="description" content="Listen to VOICE FM live. Low latency FM radio streaming in your browser." />
+<link rel="icon" href="/assets/img/logo-icon.svg" type="image/svg+xml" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="brand" href="/">
+      <img src="/assets/img/logo-icon.svg" alt="VOICE FM" />
+      <span class="name" data-station-name>VOICE FM</span>
+    </a>
+    <button class="menu-btn" aria-label="Menu">☰</button>
+    <nav class="nav-links">
+      <a href="/">Home</a>
+      <a href="/live.html" class="active">Live Radio</a>
+      <a href="/programs.html">Programs</a>
+      <a href="/schedule.html">Schedule</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container" style="padding-top:40px">
+  <section class="card">
+    <div class="row" style="justify-content:space-between">
+      <div class="row">
+        <span class="live-badge" id="liveBadge" aria-live="polite">
+          <span class="dot"></span><span id="liveText">CONNECTING…</span>
+        </span>
+        <span class="muted">HQ · Opus</span>
+      </div>
+      <span class="muted">👥 <span id="listenerCount">0</span> listening</span>
+    </div>
+
+    <h1 style="margin:18px 0 4px">LIVE FM RADIO</h1>
+    <p class="muted" style="margin-top:0">Tap Play to start the live stream.</p>
+
+    <div class="player" style="margin-top:22px">
+      <img class="logo" src="/assets/img/logo-icon.svg" alt="VOICE FM" />
+      <div class="meta">
+        <div class="title" data-station-name>VOICE FM</div>
+        <div class="sub">🎙️ <span id="programName">Live Talk</span></div>
+        <div class="sub" id="broadcastStatus">Broadcasting Live</div>
+        <div class="wave idle" id="wave" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+      <div class="controls">
+        <button class="ctrl primary" id="playBtn" aria-label="Play live stream">▶</button>
+        <button class="ctrl" id="muteBtn" aria-label="Mute">🔊</button>
+        <input id="vol" type="range" min="0" max="100" value="80" aria-label="Volume" />
+      </div>
+    </div>
+
+    <div class="row" style="margin-top:16px">
+      <span class="muted" id="connStatus">Status: idle</span>
+      <button class="btn secondary" id="reconnectBtn" hidden>↻ RECONNECT</button>
+    </div>
+    <p class="muted" id="errorMsg" role="alert" hidden style="margin-top:10px"></p>
+  </section>
+</main>
+
+<footer class="footer container">
+  <p>© <span id="year"></span> <span data-station-name>VOICE FM</span></p>
+</footer>
+
+<script type="module">
+import { Room, RoomEvent, Track } from 'https://cdn.jsdelivr.net/npm/livekit-client@2.6.0/+esm';
+
+const $ = (s) => document.querySelector(s);
+const waveEl = $('#wave'), playBtn = $('#playBtn'), muteBtn = $('#muteBtn');
+const volEl = $('#vol'), connStatus = $('#connStatus');
+const liveText = $('#liveText'), liveBadge = $('#liveBadge');
+const programName = $('#programName'), broadcastStatus = $('#broadcastStatus');
+const errorMsg = $('#errorMsg'), reconnectBtn = $('#reconnectBtn');
+
+let room = null, audioEl = null, playing = false;
+
+function setWave(a) { waveEl.classList.toggle('playing', a); waveEl.classList.toggle('idle', !a); }
+function showError(m) { errorMsg.hidden = !m; errorMsg.textContent = m || ''; }
+function setStatus(t) { connStatus.textContent = 'Status: ' + t; }
+
+async function fetchToken() {
+  const r = await fetch('/api/live/listener-token');
+  if (!r.ok) throw new Error('token');
+  return r.json();
+}
+
+async function connect() {
+  try {
+    setStatus('connecting'); showError('');
+    const { token, url } = await fetchToken();
+    if (room) { room.disconnect(); room = null; }
+    room = new Room({ adaptiveStream: false, dynacast: false });
+
+    room.on(RoomEvent.TrackSubscribed, (track) => {
+      if (track.kind === Track.Kind.Audio) {
+        audioEl = track.attach();
+        audioEl.autoplay = true;
+        document.body.appendChild(audioEl);
+        audioEl.volume = Number(volEl.value) / 100;
+        audioEl.play().then(() => {
+          playing = true; playBtn.textContent = '❚❚';
+          setWave(true); setStatus('connected');
+        }).catch(() => setStatus('tap-play'));
+      }
+    });
+    room.on(RoomEvent.TrackUnsubscribed, (track) => {
+      try { track.detach().forEach(e => e.remove()); } catch {}
+      playing = false; playBtn.textContent = '▶'; setWave(false); setStatus('off');
+    });
+    room.on(RoomEvent.Disconnected, () => {
+      setStatus('disconnected'); setWave(false);
+      broadcastStatus.textContent = 'Connection lost. Reconnecting…';
+      reconnectBtn.hidden = false;
+      setTimeout(() => connect().catch(() => {}), 2500);
+    });
+    room.on(RoomEvent.ConnectionStateChanged, (st) => setStatus(st.toLowerCase()));
+
+    await room.connect(url, token);
+    setStatus('connected');
+  } catch (e) {
+    setStatus('error');
+    showError('Radio is temporarily offline. Please try again.');
+    reconnectBtn.hidden = false; setWave(false);
+  }
+}
+
+async function disconnect() {
+  if (audioEl) { try { audioEl.pause(); audioEl.remove(); } catch {} audioEl = null; }
+  if (room) { try { await room.disconnect(); } catch {} room = null; }
+  playing = false; playBtn.textContent = '▶'; setWave(false); setStatus('idle');
+}
+
+playBtn.addEventListener('click', async () => {
+  if (playing && audioEl) { audioEl.pause(); playing = false; playBtn.textContent = '▶'; setWave(false); return; }
+  if (audioEl) { await audioEl.play(); playing = true; playBtn.textContent = '❚❚'; setWave(true); return; }
+  await connect();
+  if (audioEl) { try { await audioEl.play(); playing = true; playBtn.textContent = '❚❚'; setWave(true); } catch {} }
+});
+
+muteBtn.addEventListener('click', () => {
+  if (!audioEl) return;
+  audioEl.muted = !audioEl.muted;
+  muteBtn.textContent = audioEl.muted ? '🔇' : '🔊';
+});
+volEl.addEventListener('input', () => { if (audioEl) audioEl.volume = Number(volEl.value) / 100; });
+reconnectBtn.addEventListener('click', () => { reconnectBtn.hidden = true; connect(); });
+
+(function connectWS(){
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const ws = new WebSocket(`${proto}://${location.host}/ws`);
+  ws.onmessage = (ev) => {
+    try {
+      const s = JSON.parse(ev.data);
+      if (s.type !== 'state') return;
+      liveBadge.classList.toggle('off', !s.live);
+      liveText.textContent = s.live ? 'LIVE NOW' : 'OFF AIR';
+      $('#listenerCount').textContent = s.listeners ?? 0;
+      if (s.programTitle) programName.textContent = s.programTitle + (s.host ? ' · ' + s.host : '');
+      broadcastStatus.textContent = s.live ? 'Broadcasting Live' : 'Station is currently OFF AIR.';
+    } catch {}
+  };
+  ws.onclose = () => setTimeout(connectWS, 3000);
+})();
+
+$('#year').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
