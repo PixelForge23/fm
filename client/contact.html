@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Contact — VOICE FM</title>
+<link rel="icon" href="/assets/img/logo-icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head><body>
+<header class="site-header"><div class="container nav">
+  <a class="brand" href="/"><img src="/assets/img/logo-icon.svg" alt="VF" />
+    <span class="name" data-station-name>VOICE FM</span></a>
+  <button class="menu-btn">☰</button>
+  <nav class="nav-links">
+    <a href="/">Home</a><a href="/live.html">Live Radio</a>
+    <a href="/programs.html">Programs</a><a href="/schedule.html">Schedule</a>
+    <a href="/about.html">About</a><a href="/contact.html" class="active">Contact</a>
+  </nav>
+</div></header>
+<main class="container" style="padding-top:40px;max-width:720px">
+  <h1>Contact Us</h1>
+  <div class="card" style="margin-top:20px">
+    <p>📧 <span id="cEmail">—</span></p>
+    <p>📞 <span id="cPhone">—</span></p>
+  </div>
+  <div class="card" style="margin-top:20px">
+    <h3>Send a message</h3>
+    <form id="contactForm">
+      <input name="name" placeholder="Your name" required
+        style="width:100%;padding:12px;margin:6px 0;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+      <input name="email" type="email" placeholder="Your email" required
+        style="width:100%;padding:12px;margin:6px 0;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+      <input name="subject" placeholder="Subject"
+        style="width:100%;padding:12px;margin:6px 0;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+      <textarea name="body" rows="4" placeholder="Message" required
+        style="width:100%;padding:12px;margin:6px 0;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff"></textarea>
+      <button class="btn" type="submit">Send</button>
+      <p id="msg" class="muted" hidden></p>
+    </form>
+  </div>
+</main>
+<footer class="footer container"><p>© <span id="year"></span> VOICE FM</p></footer>
+<script type="module">
+import '/assets/js/app.js';
+fetch('/api/settings').then(r => r.json()).then(s => {
+  document.getElementById('cEmail').textContent = s.contactEmail || '—';
+  document.getElementById('cPhone').textContent = s.contactPhone || '—';
+});
+document.getElementById('contactForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = e.target;
+  const data = Object.fromEntries(new FormData(f));
+  const res = await fetch('/api/contact', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  });
+  const m = document.getElementById('msg');
+  m.hidden = false;
+  m.textContent = res.ok ? '✅ Message sent!' : '❌ Failed. Try again.';
+  if (res.ok) f.reset();
+});
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body></html>
