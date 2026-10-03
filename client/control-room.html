@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="robots" content="noindex,nofollow,noarchive,nosnippet" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Control Room</title>
+<link rel="icon" href="/assets/img/logo-icon.svg" />
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head>
+<body>
+<main class="admin-wrap">
+
+  <section id="loginView" class="card" style="max-width:420px;margin:60px auto">
+    <h1 style="margin-top:0">🔒 Control Room</h1>
+    <p class="muted">Authorized access only.</p>
+    <form id="loginForm">
+      <label for="email" class="muted">Email</label>
+      <input id="email" type="email" required autocomplete="username"
+        style="width:100%;padding:12px;margin:6px 0 14px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+      <label for="password" class="muted">Password</label>
+      <input id="password" type="password" required autocomplete="current-password"
+        style="width:100%;padding:12px;margin:6px 0 18px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+      <button class="btn" type="submit" style="width:100%">Sign In</button>
+      <p id="loginError" class="muted" style="color:#ef4444;margin-top:10px" role="alert" hidden></p>
+    </form>
+  </section>
+
+  <section id="dashView" hidden>
+    <div class="row" style="justify-content:space-between;margin-bottom:20px">
+      <h1 style="margin:0">🎛️ Control Room</h1>
+      <button class="btn secondary" id="logoutBtn">Logout</button>
+    </div>
+
+    <nav class="admin-tabs">
+      <button data-tab="broadcast" class="active">Broadcast</button>
+      <button data-tab="programs">Programs</button>
+      <button data-tab="settings">Station</button>
+      <button data-tab="seo">SEO</button>
+      <button data-tab="messages">Messages</button>
+    </nav>
+
+    <div data-panel="broadcast" class="card">
+      <h2 style="margin-top:0">🔴 LIVE BROADCAST</h2>
+      <p class="muted">Allow microphone access to start broadcasting.</p>
+      <div class="row" style="justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap">
+        <button class="mic-btn" id="micBtn" aria-pressed="false">
+          <span class="icon">🎙️</span>
+          <span id="micLabel">START LIVE</span>
+        </button>
+        <div style="min-width:260px;flex:1">
+          <div class="muted" style="margin-bottom:6px">MIC LEVEL</div>
+          <div class="meter"><i id="meterBar"></i></div>
+          <div class="row" style="margin-top:14px">
+            <button class="btn secondary" id="micTestBtn">🎚️ Test Mic</button>
+            <button class="btn secondary" id="muteMicBtn">🎤 Mute</button>
+            <span class="muted" id="broadcastState">OFF AIR</span>
+          </div>
+          <div class="row" style="margin-top:14px">
+            <input id="programTitle" placeholder="Program name (e.g. Live Talk)"
+              style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+            <input id="hostName" placeholder="Host / RJ"
+              style="flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+          </div>
+        </div>
+      </div>
+      <p id="bError" class="muted" role="alert" hidden style="color:#ef4444;margin-top:16px"></p>
+    </div>
+
+    <div data-panel="programs" class="card" hidden>
+      <h2 style="margin-top:0">📅 Programs</h2>
+      <form id="progForm" class="grid cols-2" style="gap:10px">
+        <input name="title" placeholder="Title" required
+          style="padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+        <input name="host" placeholder="Host / RJ"
+          style="padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+        <input name="start_time" placeholder="Start HH:MM" required pattern="^\d{2}:\d{2}$"
+          style="padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+        <input name="end_time" placeholder="End HH:MM" required pattern="^\d{2}:\d{2}$"
+          style="padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+        <input name="category" placeholder="Category"
+          style="padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+        <input name="description" placeholder="Description"
+          style="padding:10px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+        <button class="btn" type="submit" style="grid-column:1/-1">Add Program</button>
+      </form>
+      <div id="progList" style="margin-top:20px"></div>
+    </div>
+
+    <div data-panel="settings" class="card" hidden>
+      <h2 style="margin-top:0">⚙️ Station Settings</h2>
+      <form id="settingsForm" class="grid cols-2" style="gap:10px"></form>
+      <button class="btn" id="saveSettings" style="margin-top:14px">Save</button>
+    </div>
+
+    <div data-panel="seo" class="card" hidden>
+      <h2 style="margin-top:0">🔍 SEO Settings</h2>
+      <form id="seoForm" class="grid" style="gap:10px"></form>
+      <button class="btn" id="saveSeo" style="margin-top:14px">Save SEO</button>
+    </div>
+
+    <div data-panel="messages" class="card" hidden>
+      <h2 style="margin-top:0">📬 Messages</h2>
+      <div id="msgList"></div>
+    </div>
+  </section>
+</main>
+<script type="module" src="/assets/js/admin.js"></script>
+</body>
+</html>
