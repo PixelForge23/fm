@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Schedule — VOICE FM</title>
+<link rel="icon" href="/assets/img/logo-icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head><body>
+<header class="site-header"><div class="container nav">
+  <a class="brand" href="/"><img src="/assets/img/logo-icon.svg" alt="VF" />
+    <span class="name" data-station-name>VOICE FM</span></a>
+  <button class="menu-btn">☰</button>
+  <nav class="nav-links">
+    <a href="/">Home</a><a href="/live.html">Live Radio</a>
+    <a href="/programs.html">Programs</a>
+    <a href="/schedule.html" class="active">Schedule</a>
+    <a href="/about.html">About</a><a href="/contact.html">Contact</a>
+  </nav>
+</div></header>
+<main class="container" style="padding-top:40px">
+  <h1>📅 Program Schedule</h1>
+  <div id="list" class="grid" style="margin-top:20px"></div>
+</main>
+<footer class="footer container"><p>© <span id="year"></span> VOICE FM</p></footer>
+<script type="module">
+import '/assets/js/app.js';
+const [sched, now] = await Promise.all([
+  fetch('/api/schedule').then(r => r.json()),
+  fetch('/api/now').then(r => r.json()),
+]);
+document.getElementById('list').innerHTML = sched.map(p => {
+  const isNow = p.id === now.currentProgram?.id && now.live;
+  return `<div class="card" style="border-color:${isNow ? 'var(--live)' : 'var(--border)'}">
+    <div class="row" style="justify-content:space-between">
+      <b>${p.start_time} – ${p.end_time}</b>
+      ${isNow ? '<span class="live-badge"><span class="dot"></span>NOW ON AIR</span>' : ''}
+    </div>
+    <h3>${p.title}</h3>
+    <p class="muted">${p.host || ''} · ${p.category || ''}</p>
+    <p>${p.description || ''}</p>
+  </div>`;
+}).join('');
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+</body></html>
