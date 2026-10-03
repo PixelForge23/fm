@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Programs — VOICE FM</title>
+<link rel="icon" href="/assets/img/logo-icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="/assets/css/style.css" />
+</head><body>
+<header class="site-header"><div class="container nav">
+  <a class="brand" href="/"><img src="/assets/img/logo-icon.svg" alt="VF" />
+    <span class="name" data-station-name>VOICE FM</span></a>
+  <button class="menu-btn">☰</button>
+  <nav class="nav-links">
+    <a href="/">Home</a><a href="/live.html">Live Radio</a>
+    <a href="/programs.html" class="active">Programs</a>
+    <a href="/schedule.html">Schedule</a><a href="/about.html">About</a>
+    <a href="/contact.html">Contact</a>
+  </nav>
+</div></header>
+<main class="container" style="padding-top:40px">
+  <h1>📻 Programs</h1>
+  <div class="row" style="margin-bottom:20px">
+    <input id="searchInput" placeholder="Search programs, hosts, categories…"
+      style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff" />
+  </div>
+  <div id="list" class="grid cols-3"></div>
+</main>
+<footer class="footer container"><p>© <span id="year"></span> VOICE FM</p></footer>
+<script type="module">
+import '/assets/js/app.js';
+const $ = s => document.querySelector(s);
+async function load(q = '') {
+  const rows = await fetch('/api/programs' + (q ? '?q=' + encodeURIComponent(q) : '')).then(r => r.json());
+  $('#list').innerHTML = rows.length ? rows.map(p => `
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <b>${p.start_time} – ${p.end_time}</b>
+        <span class="muted">${p.category || ''}</span>
+      </div>
+      <h3>${p.title}</h3>
+      <p class="muted">${p.host || ''}</p>
+      <p>${p.description || ''}</p>
+    </div>`).join('') : '<p class="muted">No programs found.</p>';
+}
+load();
+$('#searchInput').addEventListener('input', e => load(e.target.value));
+$('#year').textContent = new Date().getFullYear();
+</script>
+</body></html>
