@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /control-room-9f3a2b-vf
+Sitemap: https://voicefm.onrender.com/sitemap.xml
